@@ -3,7 +3,15 @@
         <form>
             <div class="row">
                 <div class="col-md-2"> <label>Name</label> </div>
-                <div class="col-md-4"> <input class="form-control" type="text"/> </div>
+                <div class="col-md-4"> <input class="form-control" v-model="name" type="text"/> </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"> <label>Des</label> </div>
+                <div class="col-md-4">  <input class="form-control" v-model="des" type="text"/>  </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"> <label>Start Location</label> </div>
+                <div class="col-md-4"> <input class="form-control" v-model="startLocation" type="text"/>  </div>
             </div>
             <div class="row">
                 <div class="col-md-2"> <label>logo</label> </div>
@@ -23,16 +31,6 @@
                 </div>
             </div>
         </form>
-        <!-- <div class="row" v-for="item in items" v-bind:key="item.name">
-            <div>
-                 <div class="col-md-3 col-lg-3">
-                            aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                </div>
-                <div class="col-md-9 col-lg-9">
-                                {{item.age}}
-                </div>
-            </div>
-        </div>     -->
     </div>
 </template>
 
@@ -47,6 +45,9 @@ import Datepicker from '@vuepic/vue-datepicker';
 import axios from "axios";  
 let mydate = ref(new Date());
 let file = ref(null);
+let name = ref("");
+let des = ref("");
+let startLocation = ref("");
 
 const formatDate = (date) =>{
     const day = date.getDate();
@@ -62,29 +63,26 @@ function handleFileUpload(event){
 
 function  submitData(event){
     let formData = new FormData();
-    formData.append("campaignName","testname");
-    formData.append("description","testdesc");
-    formData.append("startLocation","teststartlocation");
+    formData.append("campaignName", name.value);
+    formData.append("description", des.value);
+    formData.append("startLocation", startLocation.value);
     const day = mydate.value.getDate();
     const month = mydate.value.getMonth() + 1;
     const year = mydate.value.getFullYear();
-    formData.append("startDate",`${year}/${month}/${day}`);
+    formData.append("startDate",`${year}-${month}-${day}`);
     formData.append("logo", file);
-
-    axios.post('http://146.190.192.127:8080/v1/campaign/upload', formData).then(response => {
-              console.log(response.data);
+    const config = {
+        headers: {
+            'Access-Control-Allow-Origin' : '*',
+            'Access-Control-Allow-Methods':'GET'
+        }
+    }
+    axios.post('http://146.190.192.127:8080/v1/campaign/upload', formData, config).then(response => {
+              console.log(response.data.campaignId);
           })  
           .catch(errors => console.log(errors));
 
-//     axios.get('https://localhost:44301/Running?bip=4' , {
-//     headers:{
-//       'X-Requested-With': 'XMLHttpRequest',
-//       'Access-Control-Allow-Origin' : '*',
-//       'Access-Control-Allow-Methods':'GET'
-//     }
-//  }).then(response=>{
-//     console.log("test");
-//  });
-       
+    // good link https://stackoverflow.com/questions/41878838/how-do-i-set-multipart-in-axios-with-react. No need to set content-type 
+    // multipart as based on formData axios would do
 };
 </script>
